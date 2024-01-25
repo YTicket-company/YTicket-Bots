@@ -1,1 +1,1 @@
-console.log("ratio");
+console.log("");
