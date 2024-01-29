@@ -7,7 +7,6 @@ const token =
 const clientId = "1198921038986215555";
 const guildId = "1198927880076410921";
 
-// Création du client Discord
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -34,11 +33,9 @@ client.on("messageCreate", (message) => {
 
   const prefix = "!";
 
-  // Vérifier si le message commence par le préfixe "!ping"
   if (message.content.toLowerCase().startsWith(`${prefix}ping`)) {
     console.log("Commande ping détectée");
 
-    // Envoyer "Pong!" indépendamment du contexte (serveur ou message privé)
     message.channel.send("Pong!");
   } else {
     console.log("Commande inconnue");
