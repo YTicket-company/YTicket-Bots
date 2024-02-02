@@ -1,6 +1,8 @@
 const { Client, GatewayIntentBits, Partials } = require("discord.js");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
+const moment = require("moment");
+moment.locale("fr");
 
 const token =
   "MTE5ODkyMTAzODk4NjIxNTU1NQ.GiqUZj.t4KTctKxreZL_wll8ACezoYYqfb4iqdCZ9RNbg";
@@ -23,28 +25,85 @@ const client = new Client({
   ],
 });
 
-client.on("messageCreate", (message) => {
-  if (message.author.id === client.user.id) {
-    console.log(`Message envoyé par vous : ${message.content}`);
-    return;
-  }
-
-  console.log(`Message reçu de ${message.author.tag} : ${message.content}`);
+client.on("messageCreate", async (message) => {
+  if (message.author.bot) return;
 
   const prefix = "!";
 
-  if (message.content.toLowerCase().startsWith(`${prefix}ping`)) {
-    console.log("Commande ping détectée");
+  if (message.guild) {
+    if (message.channel.name.startsWith("ticket-")) {
+      if (!message.content.startsWith(prefix)) {
+        console.log(`[${message.author.tag}]: ${message.content}`);
+      }
+    } else if (message.content.toLowerCase() === `${prefix}createticket`) {
+      try {
+        const ticketChannel = await message.guild.channels.create(
+          `ticket-${message.author.id}`,
+          {
+            type: "text",
+            permissionOverwrites: [
+              {
+                id: message.author.id,
+                allow: [
+                  Permissions.FLAGS.VIEW_CHANNEL,
+                  Permissions.FLAGS.SEND_MESSAGES,
+                ],
+              },
+              {
+                id: message.guild.roles.everyone,
+                deny: [Permissions.FLAGS.VIEW_CHANNEL],
+              },
+            ],
+          }
+        );
 
-    message.channel.send("Pong!");
+        console.log(
+          `Canal créé : ${ticketChannel.name} ID : ${ticketChannel.id}`
+        );
+
+        const fetchedChannel = message.guild.channels.cache.get(
+          ticketChannel.id
+        );
+
+        fetchedChannel.on("messageCreate", (msg) => {
+          console.log(`[${msg.author.tag}]: ${msg.content}`);
+        });
+
+        console.log(
+          `Canal créé : ${ticketChannel.name} ID : ${ticketChannel.id}`
+        );
+
+        await ticketChannel.send(
+          `Bienvenue dans votre ticket, ${message.author}!`
+        );
+      } catch (error) {
+        console.error(`Erreur lors de la création du canal : ${error.message}`);
+        console.error(error.stack);
+      }
+    }
   } else {
-    console.log("Commande inconnue");
+    console.log(`[${message.author.tag}]: ${message.content}`);
+
+    if (message.content.toLowerCase() === `${prefix}createticket`) {
+      try {
+        const ticketChannel = await message.author.createDM();
+
+        console.log(
+          `Canal créé : ${ticketChannel.name} ID : ${ticketChannel.id}`
+        );
+
+        await ticketChannel.send(
+          `Bienvenue dans votre ticket, ${message.author}! `
+        );
+      } catch (error) {
+        console.error(`Erreur lors de la création du canal : ${error.message}`);
+        console.error(error.stack);
+      }
+    }
   }
 });
 
-client.once("ready", () => {
-  console.log("Connecté !");
-});
+client.once("ready", () => {});
 
 client.login(token);
 
@@ -68,18 +127,3 @@ const registerCommands = async () => {
 };
 
 registerCommands();
-
-client.on("interactionCreate", async (interaction) => {
-  console.log(
-    `${interaction.user.tag} a exécuté la commande ${interaction.commandName}`
-  );
-
-  if (!interaction.isCommand()) return;
-
-  const { commandName } = interaction;
-
-  if (commandName === "ping") {
-    console.log("Commande ping détectée");
-    interaction.reply("Pong!");
-  }
-});
