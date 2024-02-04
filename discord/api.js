@@ -24,7 +24,7 @@ class Api {
             return response.data;
         } catch (error) {
             if (error.response && error.response.status === 422) {
-                console.log(`Error: ${error.response.data.message}`);
+                console.log(`createClient Error: ${error.response.data.message}`);
             } else {
                 console.log(error);
             }
@@ -44,7 +44,7 @@ class Api {
             return response.data;
         } catch (error) {
             if (error.response && error.response.status === 422) {
-                console.log(`Error: ${error.response.data.message}`);
+                console.log(`getClientByIdent Error: ${error.response.data.message}`);
             } else {
                 console.log(error);
             }
@@ -62,7 +62,7 @@ class Api {
             return response.data;
         } catch (error) {
             if (error.response && error.response.status === 404) {
-                console.log(`Error: ${error.response.data.message}`);
+                console.log(`getOpenedTicket Error: ${error.response.data.message}`);
             } else {
                 console.log(error);
             }
@@ -83,12 +83,28 @@ class Api {
             return response.data;
         } catch (error) {
             if (error.response && error.response.status === 422) {
-                console.log(`Error: ${error.response.data.message}`);
+                console.log(`createTicket Error: ${error.response.data.message}`);
             } else {
                 console.log(error);
             }
 
             return this.getClientByIdent(identifier);
+        }
+    }
+
+    async createMessage(ticket_id, client_id, message) {
+        try {
+            const response = await axios.post(`${this.baseUrl}/message`, {
+                ticket_id, client_id, message
+            }, { headers: this.headers });
+
+            return response.data;
+        } catch (error) {
+            if (error.response && error.response.status === 422) {
+                console.log(`createMessage Error: ${error.response.data.message}`);
+            } else {
+                console.log(error);
+            }
         }
     }
 }

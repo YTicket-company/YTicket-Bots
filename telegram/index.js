@@ -1,13 +1,17 @@
 const TelegramBot = require("node-telegram-bot-api");
-const { createServer } = require("node:http");
-const { Server } = require("socket.io");
-const express = require("express");
-const dotenv = require("dotenv");
-const { platform } = require("node:os");
-dotenv.config();
-const app = express();
-const server = createServer(app);
-const io = new Server(server);
+
+const WebSocket = require('ws');
+
+const socket = new WebSocket(`ws://${process.env.WS_URL}:${process.env.WS_PORT}`);
+
+socket.on('open', () => {
+  console.log('[Telegram] Connecté au serveur WebSocket');
+
+  // Envoyer un message au serveur lors de la connexion
+  socket.send(JSON.stringify({
+    type : "bot"
+  }));
+});
 
 const bot = new TelegramBot(process.env.TELEGRAM_TOKEN, {
   polling: true,
@@ -50,6 +54,7 @@ bot.on("message", async (msg) => {
         if (client === null) client = data;
       }
     });
+
   fetch(`${process.env.API_URL}/ticket/opened/ident/${msg.from.id}`, {
     method: "GET",
     headers,
@@ -66,7 +71,14 @@ bot.on("message", async (msg) => {
         }),
         headers,
       });
+
+      socket.send(JSON.stringify({
+        ticket_id: data.id,
+        message : msg.text,
+        name : client.name
+      }));
     });
+
   if (msg.text === "/create") {
     if (msg.chat.type !== "private") return;
 
@@ -103,26 +115,28 @@ bot.on("message", async (msg) => {
       client_identifier: msg.from.id,
       channel_id: msg.chat.id,
     };
-    fetch(`${process.env.API_URL}/ticket`, {
+    const ticket = await fetch(`${process.env.API_URL}/ticket`, {
       method: "POST",
       body: JSON.stringify(body),
       headers,
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        bot.sendMessage(msg.chat.id, "Votre ticket a été créé.");
-      });
+    }).then((res) => res.json())
+
+    bot.sendMessage(msg.chat.id, "Votre ticket a été créé.");
     return;
   }
-
-  //io.emit("sendMessage", msg);
 });
 
-io.on("connection", (socket) => {
-  socket.on("sendMessage", (res) => {
-    bot
-      .sendMessage("6874239099", `Bonjour ${res.Name}`)
-      .then((r) => console.log(r));
-  });
+socket.on('message', async (message) => {
+  const msg = JSON.parse(message);
+  if (msg.platform_id !== 2) return;
+
+  try {
+    bot.sendMessage(msg.client_identifier, msg.message)
+  } catch (e) {
+    console.log("Socker message Error :", e);
+  }
+});
+
+socket.on('close', () => {
+  console.log('[Telegram] Déconnecté du serveur WebSocket');
 });
