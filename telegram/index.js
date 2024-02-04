@@ -19,32 +19,57 @@ const headers = {
   Accept: "application/json",
   "Content-Type": "application/json",
 };
-bot.on("message", (msg) => {
-  fetch(`${process.env.API_URL}client/ident/${msg.from.id}`, {
+bot.on("message", async (msg) => {
+  let client = null;
+  let body = {
+    name: msg.from.first_name,
+    identifier: msg.from.id,
+    platform_id: 2,
+  };
+
+  await fetch(`${process.env.API_URL}client`, {
+    method: "POST",
+    body: JSON.stringify(body),
+    headers,
+  })
+    .then((res) => res.json())
+    .then(async (data) => {
+      if (data?.message?.length > 0) {
+        client = await fetch(
+          `${process.env.API_URL}client/ident/${msg.from.id}`,
+          {
+            method: "GET",
+            headers,
+          }
+        )
+          .then((res) => res.json())
+          .then((d) => {
+            return d;
+          });
+      } else {
+        if (client === null) client = data;
+      }
+    });
+  fetch(`${process.env.API_URL}ticket/opened/ident/${msg.from.id}`, {
     method: "GET",
     headers,
   })
     .then((res) => res.json())
     .then((data) => {
-      if (data.message === "Not found") {
-        const body = {
-          name: msg.from.first_name,
-          identifier: msg.from.id,
-          platform_id: 2,
-        };
-        fetch(`${process.env.API_URL}client`, {
-          method: "POST",
-          body: JSON.stringify(body),
-          headers,
-        })
-          .then((res) => res.json())
-          .then((data) => console.log(data));
-      } else {
-        console.log("Client already exist");
-      }
+      if (data?.code === 404) return;
+      fetch(`${process.env.API_URL}message`, {
+        method: "POST",
+        body: JSON.stringify({
+          ticket_id: data.id,
+          client_id: client.id,
+          message: msg.text,
+        }),
+        headers,
+      });
     });
-
   if (msg.text === "/create") {
+    if (msg.chat.type !== "private") return;
+
     fetch(`${process.env.API_URL}ticket/ident/${msg.from.id}`, {
       method: "GET",
       headers,
@@ -55,8 +80,6 @@ bot.on("message", (msg) => {
          * @param {Array} data
          * */
         (data) => {
-          console.log(data);
-
           data = data.filter(
             (ticket) =>
               ticket.status_id === 1 && ticket.channel_id === msg.chat.id
