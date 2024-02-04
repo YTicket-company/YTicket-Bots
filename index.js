@@ -1,7 +1,3 @@
-const dotenv = require("dotenv");
-const { json } = require("express");
-dotenv.config();
-
 require("./telegram");
 require("./discord");
 

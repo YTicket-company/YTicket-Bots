@@ -1,0 +1,15 @@
+version: '3.5'
+
+services:
+  app:
+    container_name: app
+    build: .
+    environment:
+      - API_URL=
+      - TELEGRAM_TOKEN=
+      - DISCORD_TOKEN=
+      - WS_PORT=
+      - WS_URL=
+    ports:
+      - 1239:8080
+      - 1238:443

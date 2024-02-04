@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "discord": "nodemon ./discord --watch discord",
-    "telegram": "nodemon ./telegram --watch telegram"
+    "telegram": "nodemon ./telegram --watch telegram",
+    "start": "nodemon ./index --watch telegram"
   },
   "keywords": [],
   "author": "",
