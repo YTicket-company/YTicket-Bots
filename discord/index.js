@@ -8,7 +8,7 @@ const moment = require("moment");
 moment.locale("fr");
 
 
-const socket = new WebSocket(`ws://${process.env.WS_URL}:${process.env.WS_PORT}`);
+const socket = new WebSocket(`ws://${process.env.WS_URL}`);
 
 socket.on('open', () => {
   console.log('[Discord] Connecté au serveur WebSocket');

@@ -2,7 +2,7 @@ const TelegramBot = require("node-telegram-bot-api");
 
 const WebSocket = require('ws');
 
-const socket = new WebSocket(`ws://${process.env.WS_URL}:${process.env.WS_PORT}`);
+const socket = new WebSocket(`ws://${process.env.WS_URL}`);
 
 socket.on('open', () => {
   console.log('[Telegram] Connecté au serveur WebSocket');
