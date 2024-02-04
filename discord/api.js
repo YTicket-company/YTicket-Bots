@@ -2,8 +2,8 @@ const axios = require('axios');
 
 class Api {
 
-    constructor() {
-        this.baseUrl = "http://yticket-api.test/api";
+    constructor(apiUrl) {
+        this.baseUrl = apiUrl;
         this.platformId = 1;
         this.headers = {
             'Accept': 'application/json',

@@ -1,1 +1,2 @@
 require("./telegram");
+require("./discord")

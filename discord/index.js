@@ -1,15 +1,13 @@
 const { Client, GatewayIntentBits, Partials, Events} = require("discord.js");
-const { REST } = require("@discordjs/rest");
-const { Routes } = require("discord-api-types/v9");
+
+const dotenv = require("dotenv");
+dotenv.config();
+
 const Api = require('./api');
+
 const moment = require("moment");
 
 moment.locale("fr");
-
-
-const token = "MTE5ODkyMTAzODk4NjIxNTU1NQ.GiqUZj.t4KTctKxreZL_wll8ACezoYYqfb4iqdCZ9RNbg";
-const clientId = "1198921038986215555";
-const guildId = "1198927880076410921";
 
 const client = new Client({
   intents: [
@@ -32,9 +30,9 @@ client.once("ready", () => {
     console.log("Bot on !")
 });
 
-client.login(token);
+client.login(process.env.DISCORD_TOKEN);
 
-const api = new Api();
+const api = new Api(process.env.API_URL);
 
 client.on(Events.MessageCreate, async (message) => {
     if (message.author.bot || message.guild) return;

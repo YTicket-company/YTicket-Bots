@@ -9,7 +9,7 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server);
 
-const bot = new TelegramBot("6712736801:AAFNsvtXi7T1XYupSdxY0bSM2Tx8ZFs1Ef0", {
+const bot = new TelegramBot(process.env.TELEGRAM_TOKEN, {
   polling: true,
 });
 
@@ -27,7 +27,7 @@ bot.on("message", async (msg) => {
     platform_id: 2,
   };
 
-  await fetch(`${process.env.API_URL}client`, {
+  await fetch(`${process.env.API_URL}/client`, {
     method: "POST",
     body: JSON.stringify(body),
     headers,
@@ -36,7 +36,7 @@ bot.on("message", async (msg) => {
     .then(async (data) => {
       if (data?.message?.length > 0) {
         client = await fetch(
-          `${process.env.API_URL}client/ident/${msg.from.id}`,
+          `${process.env.API_URL}/client/ident/${msg.from.id}`,
           {
             method: "GET",
             headers,
@@ -50,14 +50,14 @@ bot.on("message", async (msg) => {
         if (client === null) client = data;
       }
     });
-  fetch(`${process.env.API_URL}ticket/opened/ident/${msg.from.id}`, {
+  fetch(`${process.env.API_URL}/ticket/opened/ident/${msg.from.id}`, {
     method: "GET",
     headers,
   })
     .then((res) => res.json())
     .then((data) => {
       if (data?.code === 404) return;
-      fetch(`${process.env.API_URL}message`, {
+      fetch(`${process.env.API_URL}/message`, {
         method: "POST",
         body: JSON.stringify({
           ticket_id: data.id,
@@ -70,7 +70,7 @@ bot.on("message", async (msg) => {
   if (msg.text === "/create") {
     if (msg.chat.type !== "private") return;
 
-    fetch(`${process.env.API_URL}ticket/ident/${msg.from.id}`, {
+    fetch(`${process.env.API_URL}/ticket/ident/${msg.from.id}`, {
       method: "GET",
       headers,
     })
@@ -103,7 +103,7 @@ bot.on("message", async (msg) => {
       client_identifier: msg.from.id,
       channel_id: msg.chat.id,
     };
-    fetch(`${process.env.API_URL}ticket`, {
+    fetch(`${process.env.API_URL}/ticket`, {
       method: "POST",
       body: JSON.stringify(body),
       headers,
