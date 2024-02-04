@@ -5,11 +5,11 @@ services:
     container_name: app
     build: .
     environment:
-      - API_URL=
-      - TELEGRAM_TOKEN=
-      - DISCORD_TOKEN=
-      - WS_PORT=
-      - WS_URL=
+      - API_URL=https://yticket.mazbaz.fr/api
+      - TELEGRAM_TOKEN=6712736801:AAFNsvtXi7T1XYupSdxY0bSM2Tx8ZFs1Ef0
+      - DISCORD_TOKEN=MTE5ODkyMTAzODk4NjIxNTU1NQ.GiqUZj.t4KTctKxreZL_wll8ACezoYYqfb4iqdCZ9RNbg
+      - WS_PORT=8080
+      - WS_URL=localhost
     ports:
       - 1239:8080
       - 1238:443
