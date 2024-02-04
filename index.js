@@ -2,7 +2,7 @@ require("./telegram");
 require("./discord");
 
 const WebSocket = require('ws');
-const wss = new WebSocket.Server({ port: process.env.WS_PORT });
+const wss = new WebSocket.Server({ host: process.env.WS_HOST, port: process.env.WS_PORT });
 
 var clients = new Array();
 var bots = new Array();
