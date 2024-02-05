@@ -1,15 +1,32 @@
-version: '3.5'
-
 services:
-  app:
-    container_name: app
-    build: .
+  node-ws:
+    container_name: node-ws
+    image: mazbaz/yticket-bots-ws:master
+    environment:
+      - WS_HOST=node-ws
+      - WS_PORT=8080
+    networks:
+      - traefik
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.node-bots.loadbalancer.server.port=8080"
+      - "traefik.http.routers.node-bots.service=node-bots"
+      - "traefik.http.routers.node-bots.rule=Host(`yticket-wss.mazbaz.fr`)"
+      - "traefik.http.routers.node-bots.entrypoints=web"
+
+
+  node-bots:
+    container_name: node-bots
+    image: mazbaz/yticket-bots:master
     environment:
       - API_URL=https://yticket.mazbaz.fr/api
       - TELEGRAM_TOKEN=6712736801:AAFNsvtXi7T1XYupSdxY0bSM2Tx8ZFs1Ef0
-      - DISCORD_TOKEN=MTE5ODkyMTAzODk4NjIxNTU1NQ.GiqUZj.t4KTctKxreZL_wll8ACezoYYqfb4iqdCZ9RNbg
-      - WS_PORT=8080
-      - WS_URL=localhost
-    ports:
-      - 1239:8080
-      - 1238:443
+      - DISCORD_TOKEN=MTA4OTk0NTQ0ODAzNjQ1MDMwNA.GfQLbV.1zzvtuCBXuxwLmsEpvrT-9vS_rdHqILleERXrQ
+      - WS_URL=yticket-wss.mazbaz.fr
+
+networks:
+  traefik:
+    external:
+      name: traefik
+
