@@ -84,8 +84,14 @@ socket.on('message', async (message) => {
   const msg = JSON.parse(message);
   if (msg.platform_id !== 1) return;
 
+  msgToSend = msg.message
+
+  if (msg?.action === "close") {
+    msgToSend = "Ticket closed !"
+  }
+
   try {
-    client.users.cache.get(`${msg.client_identifier}`).send(msg.message)
+    client.users.cache.get(`${msg.client_identifier}`).send(msgToSend)
   } catch (e) {
     console.log("Socker message Error :", e);
   }

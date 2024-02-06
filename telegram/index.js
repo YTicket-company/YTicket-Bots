@@ -130,13 +130,18 @@ socket.on('message', async (message) => {
   const msg = JSON.parse(message);
   if (msg.platform_id !== 2) return;
 
+  msgToSend = msg.message
+
+  if (msg?.action === "close") {
+    msgToSend = "Ticket closed !"
+  }
+
   try {
     bot.sendMessage(msg.client_identifier, msg.message)
   } catch (e) {
     console.log("Socker message Error :", e);
   }
 });
-
 socket.on('close', () => {
   console.log('[Telegram] Déconnecté du serveur WebSocket');
 });

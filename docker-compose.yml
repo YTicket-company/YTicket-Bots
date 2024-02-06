@@ -4,13 +4,14 @@ services:
     node-bots:
     container_name: node-bots
     image: mazbaz/yticket-bots:master
+
     environment:
       - API_URL=https://yticket.mazbaz.fr/api
       - TELEGRAM_TOKEN=
       - DISCORD_TOKEN=
       - WS_HOST=node-bots
-      - WS_PORT=80
-      - WS_URL=node-bots
+      - WS_PORT=8080
+      - WS_URL=node-bots:8080
     networks:
       - traefik
 
